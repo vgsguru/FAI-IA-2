@@ -24,8 +24,8 @@
 | Academic Information | Candidate Details |
 | :--- | :--- |
 | **Course Code & Title:** | **25ML35T / Foundations of Artificial Intelligence** |
-| **Student Name:** | **Guru Prasath S** |
-| **University Register No:** | **113223010101** |
+| **Student Name:** | **Guru Sanjeeth V** |
+| **University Register No:** | **113025148029** |
 | **Class & Section:** | **II Year B.Tech — CSE (AI & ML) - Section A** |
 | **Course Faculty / Evaluator:** | **Dr. Manoj Kumar D S**, Associate Professor |
 | **Academic Term:** | **2026 – 2027 Odd Semester** |
