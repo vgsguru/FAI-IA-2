@@ -59,11 +59,31 @@ Where:
 
 $$h(n) = |x_n - x_g| + |y_n - y_g|$$
 
-Because the AGV moves orthogonally across 4-connected grid cells and cell costs are $\ge 1.0$, $h(n)$ never overestimates the true cost to reach the goal ($h(n) \le h^*(n)$), guaranteeing optimal and complete solutions.
+---
+
+## 3. Constraint Satisfaction Problem (CSP) Dispatch Engine
+
+Multi-robot missions cannot be dispatched haphazardly without causing corridor deadlocks, elevator queue starvation, or battery collapse. AegisMed formulates delivery scheduling as a formal Constraint Satisfaction Problem:
+
+$$\mathcal{P} = \langle \mathcal{X}, \mathcal{D}, \mathcal{C} \rangle$$
+
+### 3.1 CSP Formalism
+- **Variables ($\mathcal{X}$)**: Set of active clinical delivery tasks $\{T_1, T_2, T_3, T_4, T_5\}$.
+- **Domains ($\mathcal{D}_i$)**: Available dispatch time slots $\{0, 1, 2, \dots, 7\}$ representing operational half-hour intervals from 08:30 AM to 12:30 PM.
+- **Constraints ($\mathcal{C}$)**:
+  1. *Temporal Window Constraint*: $\text{start}_i \le \text{slot}(T_i) \le \text{end}_i$ (Unary).
+  2. *Fleet Concurrency Limit*: $\text{slot}(T_i) \neq \text{slot}(T_j)$ for all $i \neq j$ (Binary AllDifferent).
+  3. *Elevator Mutual Exclusion*: If $\text{requires\_lift}(T_i) \land \text{requires\_lift}(T_j)$, then $\text{slot}(T_i) \neq \text{slot}(T_j)$.
+  4. *Urgency Priority Invariant*: STAT priority tasks ($\text{urgency} = 3$) receive precedence in variable ordering.
+
+### 3.2 Optimization Algorithms
+- **Minimum Remaining Values (MRV)**: Selects the unassigned task variable with the smallest legal domain size $|\mathcal{D}_i|$, maximizing early failure detection.
+- **Degree Heuristic**: Breaks ties by prioritizing the variable involved in the greatest number of active binary constraints.
+- **AC-3 Arc Consistency Propagation**: Enforces arc consistency over the binary constraint network before and during recursive backtracking search, proactively pruning infeasible branches.
 
 ---
 
-## 3. Quickstart Execution
+## 4. Quickstart Execution
 ```bash
 # 1-Click Launch (Windows)
 run.bat
