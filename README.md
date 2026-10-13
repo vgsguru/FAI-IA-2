@@ -67,23 +67,40 @@ Multi-robot missions cannot be dispatched haphazardly without causing corridor d
 
 $$\mathcal{P} = \langle \mathcal{X}, \mathcal{D}, \mathcal{C} \rangle$$
 
-### 3.1 CSP Formalism
-- **Variables ($\mathcal{X}$)**: Set of active clinical delivery tasks $\{T_1, T_2, T_3, T_4, T_5\}$.
-- **Domains ($\mathcal{D}_i$)**: Available dispatch time slots $\{0, 1, 2, \dots, 7\}$ representing operational half-hour intervals from 08:30 AM to 12:30 PM.
-- **Constraints ($\mathcal{C}$)**:
-  1. *Temporal Window Constraint*: $\text{start}_i \le \text{slot}(T_i) \le \text{end}_i$ (Unary).
-  2. *Fleet Concurrency Limit*: $\text{slot}(T_i) \neq \text{slot}(T_j)$ for all $i \neq j$ (Binary AllDifferent).
-  3. *Elevator Mutual Exclusion*: If $\text{requires\_lift}(T_i) \land \text{requires\_lift}(T_j)$, then $\text{slot}(T_i) \neq \text{slot}(T_j)$.
-  4. *Urgency Priority Invariant*: STAT priority tasks ($\text{urgency} = 3$) receive precedence in variable ordering.
-
-### 3.2 Optimization Algorithms
-- **Minimum Remaining Values (MRV)**: Selects the unassigned task variable with the smallest legal domain size $|\mathcal{D}_i|$, maximizing early failure detection.
-- **Degree Heuristic**: Breaks ties by prioritizing the variable involved in the greatest number of active binary constraints.
-- **AC-3 Arc Consistency Propagation**: Enforces arc consistency over the binary constraint network before and during recursive backtracking search, proactively pruning infeasible branches.
+- **Variables ($\mathcal{X}$)**: Active clinical delivery tasks $\{T_1, T_2, T_3, T_4, T_5\}$.
+- **Domains ($\mathcal{D}_i$)**: Available dispatch time slots $\{0, 1, 2, \dots, 7\}$ (08:30 AM – 12:30 PM).
+- **Algorithms**: Backtracking Search with Minimum Remaining Values (MRV) heuristic, Degree heuristic, and AC-3 Arc Consistency Propagation.
 
 ---
 
-## 4. Quickstart Execution
+## 4. Clinical Knowledge Engine & First-Order Rules
+
+Before path planning begins, a forward-chaining expert system evaluates clinical regulations and modifies the environment graph dynamically.
+
+### 4.1 First-Order Horn Clause Knowledge Base
+1. **Rule 1 (ICU Sterility Protocol)**:  
+   $$\text{Zone}(z, \text{ICU}) \land \neg \text{SterileCertified}(r) \implies \text{BlockCell}(z)$$  
+   *Justification:* Prevents non-decontaminated robots from entering critical care units.
+
+2. **Rule 2 (Visiting Hours Foot-Traffic Throttling)**:  
+   $$\text{Corridor}(c) \land \text{VisitingShift}(t) \implies \text{CostMultiplier}(c, 3.5)$$  
+   *Justification:* Avoids high-density visitor hallways during 10:00–12:00 PM shift change.
+
+3. **Rule 3 (Biohazard Spill Containment)**:  
+   $$\text{SpillReported}(c) \implies \text{BlockCell}(c)$$  
+   *Justification:* Quarantines contaminated floor areas until hazmat sanitization clears.
+
+4. **Rule 4 (Code Blue Priority Expressway)**:  
+   $$\text{CodeBlueActive}(z) \land \text{Route}(r, z) \implies \text{CostMultiplier}(r, 0.5) \land \text{ClearYield}(r)$$  
+   *Justification:* Clears transit pathways for life-critical resuscitation delivery.
+
+5. **Rule 5 (Pediatric Quiet Hours Speed Limit)**:  
+   $$\text{QuietHoursActive}(t) \land \text{Zone}(z, \text{Pediatrics}) \implies \text{VelocityCap}(r, \text{Low})$$  
+   *Justification:* Enforces acoustic limits (< 45 dB) during patient rest intervals.
+
+---
+
+## 5. Quickstart Execution
 ```bash
 # 1-Click Launch (Windows)
 run.bat
