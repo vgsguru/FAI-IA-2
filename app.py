@@ -1,7 +1,7 @@
 """
 AegisMed — Autonomous Hospital Fleet Commander
 Modern Minimal White + Purple UI with Animations
-Author: Guru Prasath S (113223010101)
+Author: Guru Sanjeeth V (113025148029)
 """
 
 import tkinter as tk
@@ -137,7 +137,7 @@ class AegisMedApp(tk.Tk):
         right.pack(side=tk.RIGHT, pady=12)
 
         self._badge(right, "● System Online", PURPLE)
-        self._badge(right, "Guru Prasath S  ·  113223010101", FONT_MID)
+        self._badge(right, "Guru Sanjeeth V  ·  113025148029", FONT_MID)
 
     def _badge(self, parent, text, color):
         lbl = tk.Label(parent, text=text, font=(FONT_FAMILY, 9), fg=color, bg=PURPLE_GHOST,
