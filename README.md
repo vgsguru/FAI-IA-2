@@ -16,7 +16,7 @@
 
 ## 1. Project Overview & Multi-Tier AI Architecture
 
-AegisMed is an integrated autonomous hospital robotics operations suite designed for high-stakes healthcare transport (blood bags, chemotherapy vials, surgical trays, pathology specimens). 
+AegisMed is an integrated autonomous hospital robotics operations suite designed for high-stakes healthcare transport (blood bags, chemotherapy vials, surgical trays, pathology specimens).
 
 ```
 ┌────────────────────────────────────────────────────────────────────────┐
@@ -30,11 +30,40 @@ AegisMed is an integrated autonomous hospital robotics operations suite designed
 └────────────────────────────────┴───────────────────────────────────────┘
 ```
 
-The system reconciles tight time-windows, battery ceilings, and elevator bottleneck constraints before executing sub-millisecond pathfinding across complex clinical wards.
+---
+
+## 2. Spatial Grid Topology & Heuristic Pathfinding
+
+The physical hospital facility is structured as a **24 columns × 18 rows** topological matrix comprising sterile zones, surgical wards, elevators, and transit corridors.
+
+### 2.1 Spatial Zones & Movement Weights
+| Zone Code | Department Name | Sterility Requirement | Base Traversal Weight |
+| :--- | :--- | :--- | :--- |
+| `PHARMACY` | Central Pharmacy Depot | Standard | 1.0x |
+| `ICU` | Intensive Critical Care Complex | Level-4 Cleanroom Required | 1.2x |
+| `LAB` | Central Diagnostic Pathology | Standard | 1.0x |
+| `SURGERY` | Surgical Suites / OR | Sterile Isolation | 1.1x |
+| `WARD` | Inpatient General Care | Low Noise Constraint | 1.0x |
+| `LIFT` | High-Capacity Service Elevator | Vertical Transit Locking | 1.0x |
+| `TRIAGE` | Emergency Resuscitation ER | STAT Immediate Access | 1.0x |
+| `WALL` | Structural Partitions & Barriers | Non-Traversable | $\infty$ |
+
+### 2.2 Mathematical Formulation of Informed A* Search
+The routing engine computes optimal paths by evaluating an evaluation function $f(n)$ at each candidate node $n$:
+
+$$f(n) = g(n) + h(n)$$
+
+Where:
+- $g(n)$: Exact accumulated movement cost from start cell $S$ to current cell $n$, factoring corridor congestion weights.
+- $h(n)$: Admissible Manhattan distance heuristic to target $G = (x_g, y_g)$:
+
+$$h(n) = |x_n - x_g| + |y_n - y_g|$$
+
+Because the AGV moves orthogonally across 4-connected grid cells and cell costs are $\ge 1.0$, $h(n)$ never overestimates the true cost to reach the goal ($h(n) \le h^*(n)$), guaranteeing optimal and complete solutions.
 
 ---
 
-## 2. Quickstart Execution
+## 3. Quickstart Execution
 ```bash
 # 1-Click Launch (Windows)
 run.bat
@@ -42,4 +71,4 @@ run.bat
 # Standard CLI Execution
 python app.py
 ```
-Zero external dependencies — runs directly on standard Python 3.10+.
+Zero external dependencies — pure standard library.
