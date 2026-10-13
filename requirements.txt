@@ -1,0 +1,3 @@
+# AegisMed Requirements
+# Built with standard Python library modules (tkinter, heapq, collections, dataclasses)
+# No external C-dependencies required for execution.
